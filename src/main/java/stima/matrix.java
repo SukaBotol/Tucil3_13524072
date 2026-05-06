@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
-import javafx.scene.layout.Priority;
-
 // stores everything basically
 public class matrix {
     
@@ -26,6 +24,7 @@ public class matrix {
     public int col;
     public position player;
     public position goal;
+    public int number;
     public ArrayList<Integer> visited_numbers;
     public char[][] c;
     public int [][] cost;
@@ -70,18 +69,21 @@ public class matrix {
     public void copy(matrix source){
         this.col = source.col;
         this.row = source.row;
+        this.c = new char[row][col];
+        this.cost = new int[row][col];
         for(int i=0;i<source.row;i++){
             for(int j=0;j<source.col;j++){
                 this.c[i][j] = source.c[i][j];
                 this.cost[i][j] = source.cost[i][j];
             }
         }
-        this.player = source.player;
-        this.goal = source.goal;
-        this.visited_numbers = source.visited_numbers;
+        this.player = new position(source.player.r, source.player.c);
+        this.goal = new position(source.goal.r, source.goal.c);
+        this.visited_numbers = new ArrayList<>(source.visited_numbers);
     }
 
     public void initialize_positions(){
+        ArrayList<Character> temp = new ArrayList<>();
         for(int i=0;i<this.row;i++){
             for(int j=0;j<this.col;j++){
                 if(this.c[i][j]=='O'){
@@ -91,17 +93,30 @@ public class matrix {
                     this.player = new position(i,j);
                     this.c[i][j] = '*';
                 }
+                else if(this.c[i][j]=='0' || this.c[i][j]=='1' || this.c[i][j]=='2' || this.c[i][j]=='3' || this.c[i][j]=='4'
+                || this.c[i][j]=='5' || this.c[i][j]=='6' || this.c[i][j]=='7' || this.c[i][j]=='8' || this.c[i][j]=='9'){
+                    temp.add(this.c[i][j]);
+                }
             }
         }
+        number = temp.size();
     }
 
     private boolean prev_is_in(int current, ArrayList<Integer> visited){
-        if(current==0) return true;
+        if(visited.contains(current)){
+            return true;
+        }
         else{
-            if(visited.contains(current-1)){
-                visited.add(current);
+            if(current==0){
+                visited.add(0);
+                return true;
             }
-            else return false;
+            else{
+                if(visited.contains(current-1)){
+                    visited.add(current);
+                }
+                else return false;
+            }
         }
         return true;
     }
@@ -190,7 +205,7 @@ public class matrix {
         return new simulate_move_result(new position(i, j), cost);
     }
 
-    private class State{
+    public class State{
         public position pos;
         public ArrayList<direction> path;
         public ArrayList<Integer> visited;
@@ -211,9 +226,22 @@ public class matrix {
         return Math.sqrt(Math.pow(r1-this.goal.r, 2) + Math.pow(c1-this.goal.c, 2));
     }
 
-    public ArrayList<direction> search(int mode){   // mode: algorithm
+    public class result{
+        public int iterations;
+        public ArrayList<direction> path;
+        public double cost;
+
+        public result(int iter, ArrayList<direction> path, double cost){
+            this.iterations=iter;
+            this.path=path;
+            this.cost=cost;
+        }
+    }
+
+    public result search(int mode){   // mode: algorithm
         HashSet<String> set = new HashSet<>(); // so we dont overlap/redo paths
         PriorityQueue<State> que = new PriorityQueue<>();
+        int iter=0;
         // ucs
         if(mode==0){
             que = new PriorityQueue<>((a,b) -> Double.compare(a.cost, b.cost));
@@ -230,10 +258,11 @@ public class matrix {
         State start = new State(new position(this.player.r, this.player.c), new ArrayList<>(), new ArrayList<>(),0);
         que.add(start);
         while(!que.isEmpty()){
+            iter++;
             State current = que.poll();
             if(set.contains(current.getKey())) continue;
-            if(current.pos.r==this.goal.r && current.pos.c==this.goal.c){
-                return current.path;
+            if(current.pos.r==this.goal.r && current.pos.c==this.goal.c && current.visited.size()==number){
+                return new result(iter, current.path, current.cost);
             }
 
             set.add(current.getKey());
@@ -254,6 +283,6 @@ public class matrix {
             }
         }
 
-        return new ArrayList<>(); // not found
+        return null; // not found
     }
 }
