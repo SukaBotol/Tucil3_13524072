@@ -66,6 +66,41 @@ public class matrix {
         }
     }
 
+    public String matrix_to_string(position player_pos){
+        StringBuilder build = new StringBuilder();
+        for(int i=0;i<this.row;i++){
+            for(int j=0;j<col;j++){
+                if(player_pos==null){
+                    if(i==this.player.r && j==this.player.c){
+                        build.append("Z");
+                    }
+                    else{
+                        build.append(this.c[i][j]);
+                    }
+                }
+                else{
+                    if(i==player_pos.r && j==player_pos.c){
+                        build.append("Z");
+                    }
+                    else{
+                        build.append(this.c[i][j]);
+                    }
+                }
+            }
+            build.append("\n");
+        }
+        if(player_pos==null){
+            for(int i=0;i<this.row;i++){
+                for(int j=0;j<col;j++){
+                    build.append(this.cost[i][j] + " ");
+                }
+                build.append("\n");
+            }
+        }
+
+        return build.toString();
+    }
+
     public void copy(matrix source){
         this.col = source.col;
         this.row = source.row;
@@ -227,11 +262,11 @@ public class matrix {
     }
 
     public class result{
-        public int iterations;
         public ArrayList<direction> path;
+        public ArrayList<State> iterations;
         public double cost;
 
-        public result(int iter, ArrayList<direction> path, double cost){
+        public result(ArrayList<State> iter, ArrayList<direction> path, double cost){
             this.iterations=iter;
             this.path=path;
             this.cost=cost;
@@ -241,7 +276,7 @@ public class matrix {
     public result search(int mode){   // mode: algorithm
         HashSet<String> set = new HashSet<>(); // so we dont overlap/redo paths
         PriorityQueue<State> que = new PriorityQueue<>();
-        int iter=0;
+        ArrayList<State> iter = new ArrayList<>();
         // ucs
         if(mode==0){
             que = new PriorityQueue<>((a,b) -> Double.compare(a.cost, b.cost));
@@ -258,8 +293,8 @@ public class matrix {
         State start = new State(new position(this.player.r, this.player.c), new ArrayList<>(), new ArrayList<>(),0);
         que.add(start);
         while(!que.isEmpty()){
-            iter++;
             State current = que.poll();
+            iter.add(current);
             if(set.contains(current.getKey())) continue;
             if(current.pos.r==this.goal.r && current.pos.c==this.goal.c && current.visited.size()==number){
                 return new result(iter, current.path, current.cost);
@@ -283,6 +318,6 @@ public class matrix {
             }
         }
 
-        return null; // not found
+        return new result(iter, null, 0); // not found
     }
 }

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class the_io {
+public class the_i {
 
     public static matrix read_file(String source) throws Exception{
         File file = new File(source);

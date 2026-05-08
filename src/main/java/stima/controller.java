@@ -1,6 +1,8 @@
 package stima;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -52,6 +54,9 @@ public class controller implements Initializable{
     
     @FXML
     private Label solution_label;
+
+    @FXML
+    private Label solution_text;
     
     @FXML
     private Label cost_label;
@@ -61,6 +66,9 @@ public class controller implements Initializable{
 
     @FXML
     private Label time_label;
+
+    @FXML
+    private Label shortcuts;
 
     @FXML
     private Slider speed_slider;
@@ -85,7 +93,6 @@ public class controller implements Initializable{
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1){
-        filechooser.setInitialDirectory(new File("../Tucil3_13524072/data"));
         speed_slider.setValue(0);
         method.getItems().addAll(choices);
         save_button.setDisable(true);
@@ -98,6 +105,7 @@ public class controller implements Initializable{
         speed_slider.setMinorTickCount(0);
         speed_slider.setBlockIncrement(1);
         speed_slider.setSnapToTicks(true);
+        shortcuts.setText("Shortcuts: \nJ: Decrease speed\nK: Pause/Play\nL: Increase speed\nM: Stop\n<: Back\n >: Forward");
         method.setValue(choices[0]);
     }
 
@@ -105,7 +113,7 @@ public class controller implements Initializable{
     FileChooser filechooser = new FileChooser();
     File file;
     public void selectFile(ActionEvent e){
-
+        filechooser.setInitialDirectory(new File("../Tucil3_13524072/data"));
         if(board_thread!=null){
             board_thread.interrupt();
         }
@@ -114,7 +122,7 @@ public class controller implements Initializable{
         file = filechooser.showOpenDialog(new Stage());
         if (file==null) return;
         try{
-            current = the_io.read_file(file.getPath());
+            current = the_i.read_file(file.getPath());
         } catch (Exception r){
             r.printStackTrace();
         }
@@ -127,6 +135,7 @@ public class controller implements Initializable{
         cost_label.setText("cost: ");
         iteration_label.setText("total iterations: ");
         time_label.setText("time taken: ");
+        solution_label.setText("");
         solution_label.setWrapText(true);
 
         boarding();
@@ -134,46 +143,53 @@ public class controller implements Initializable{
 
 
     // WIP
-    // @FXML
-    // void save(ActionEvent event){
-    //     filechooser.setTitle("Save to .txt file");
-    //     filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
-    //     File file = filechooser.showSaveDialog(new Stage());
-    //     filechooser.setTitle("Save to .txt file");
-    //     if(file != null){
-    //         StringBuilder stringgy = new StringBuilder();
-    //         for(int i=0;i<current.row;i++){
-    //             for(int j=0;j<current.col;j++){
-    //                 stringgy.append(tempres.data[i][j]);
-    //             }
-    //             stringgy.append("\n");
-    //         }
-    //         stringgy.append("\n");stringgy.append(iterationCount.getText());
-    //         stringgy.append("\n");stringgy.append(timeTaken.getText());
-    //         System.out.println(stringgy.toString());
-    //         saveSystem(file, stringgy.toString());
-    //     }
-    // }
+    @FXML
+    void save(ActionEvent event){
+        filechooser.setInitialDirectory(new File("../Tucil3_13524072/test"));
+        filechooser.setTitle("Save to .txt file");
+        filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
+        File file = filechooser.showSaveDialog(new Stage());
+        filechooser.setTitle("Save to .txt file");
+        if(file != null){
+            StringBuilder stringgy = new StringBuilder();
+            matrix.position temp = null;
+            stringgy.append(current.matrix_to_string(temp));
+            stringgy.append("----------- Result ----------\n");
+            stringgy.append(time_label.getText()+"\n");
+            stringgy.append(iteration_label.getText()+"\n\n");
 
-    // public void saveSystem(File file, String content){
-    //     try {
-    //         if(content.equals(null)){
-    //             throw new IllegalArgumentException("There's nothing in the result Area");
-    //         }
-    //         else {
-    //             PrintWriter writer = new PrintWriter(file);
-    //             writer.write(content);
-    //             writer.close();
-    //         }
+            int i=1;
+            for(matrix.State st : result.iterations){
+                stringgy.append("Iteration "+i+":\n");
+                stringgy.append(current.matrix_to_string(st.pos));
+                stringgy.append("\n");
+                i++;
+            }
+
+            saveSystem(file, stringgy.toString());
+        }
+    }
+
+    public void saveSystem(File file, String content){
+        try {
+            if(content.equals(null)){
+                throw new IllegalArgumentException("There's nothing in the result Area");
+            }
+            else {
+                PrintWriter writer = new PrintWriter(file);
+                writer.write(content);
+                writer.close();
+            }
             
-    //     } catch (FileNotFoundException e) {
-    //         e.printStackTrace();
-    //     }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         
-    // }
+    }
 
     // board creation
     public void boarding(){
+        solution_text.setText("found solution: ");
         gridpane.getChildren().clear();
         gridpane.getRowConstraints().clear();
         gridpane.getColumnConstraints().clear();
@@ -229,6 +245,8 @@ public class controller implements Initializable{
     public void solve(){
         result=null;
         player_pos_to_end.clear();
+        current_index=0;
+        boarding();
         double start=System.nanoTime();
         if(method.getValue().equals("UCS")){
             result = current.search(0);
@@ -241,13 +259,11 @@ public class controller implements Initializable{
         }
         
         StringBuilder build = new StringBuilder("");
-        if(result==null){
-            solution_label.setText("found solution: no lmao");
+        if(result.path==null){
+            solution_text.setText("found solution: no lmao");
         }
         else{
             cost_label.setText("cost: "+(int)result.cost);
-            iteration_label.setText("total iterations: "+result.iterations);
-            save_button.setDisable(false);
             pause_button.setDisable(false);
             stop_button.setDisable(false);
             speed_slider.setDisable(false);
@@ -273,6 +289,8 @@ public class controller implements Initializable{
                 }
             }
         }
+        save_button.setDisable(false);
+        iteration_label.setText("total iterations: "+result.iterations.size());
         solution_label.setText(build.toString());
         time_label.setText(String.format("time taken: %fms", (System.nanoTime()-start)/1_000_000));
     }
@@ -317,6 +335,7 @@ public class controller implements Initializable{
     public void handle_stop(){
         pause_button.setText(" ▶ ");
         prev_speed=0;
+        current_index=0;
         speed_slider.setValue(0);
         board_running = false;
         should_stop = true;
@@ -365,20 +384,23 @@ public class controller implements Initializable{
                     }
                 }
                 else if(speed_slider.getValue()<0){
-                    final matrix.position new_pos = (current_index == 0) ? current.player : player_pos_to_end.get(current_index-1);
-                    final matrix.position old_pos = player_pos_to_end.get(current_index);
-
-                    javafx.application.Platform.runLater(()->{
-                        if(old_pos.c==current.goal.c && old_pos.r==current.goal.r){
-                            update_board(old_pos.r, old_pos.c, goal_color);
-                        }
-                        else{
-                            update_board(old_pos.r, old_pos.c, normal_color);
-                        }
-                        update_board(new_pos.r, new_pos.c, player_color);
-                    });
+                    if(current_index>=0){
+                        final matrix.position new_pos = (current_index == 0) ? current.player : player_pos_to_end.get(current_index-1);
+                        final matrix.position old_pos = player_pos_to_end.get(current_index);
+    
+                        javafx.application.Platform.runLater(()->{
+                            if(old_pos.c==current.goal.c && old_pos.r==current.goal.r){
+                                update_board(old_pos.r, old_pos.c, goal_color);
+                            }
+                            else{
+                                update_board(old_pos.r, old_pos.c, normal_color);
+                            }
+                            update_board(new_pos.r, new_pos.c, player_color);
+                        });
+                        
+                        current_index--;
+                    }
                     
-                    current_index--;
                     if(current_index<0){
                         current_index=0;
                     }
@@ -421,7 +443,7 @@ public class controller implements Initializable{
                         speed_slider.setValue(speed_slider.getValue()+1);
                     }
                     break;
-                case SPACE:
+                case M:
                     handle_stop();
                     break;
                 case PERIOD:

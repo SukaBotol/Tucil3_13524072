@@ -36,16 +36,17 @@
                   <Label fx:id="cost_label" layoutX="35.0" layoutY="145.0" text="cost: " />
                   <Button fx:id="press_button" layoutX="49.0" layoutY="46.0" mnemonicParsing="false" onAction="#selectFile" text="Select .txt file" />
                   <Line endX="164.0" endY="172.5" layoutX="-164.0" layoutY="377.0" startX="164.0" startY="-377.0" />
-                  <Slider fx:id="speed_slider" blockIncrement="1.0" layoutX="59.0" layoutY="409.0" max="5.0" min="-5.0" />
+                  <Slider fx:id="speed_slider" blockIncrement="1.0" layoutX="59.0" layoutY="350.0" max="5.0" min="-5.0" />
                   <Button fx:id="solve_button" layoutX="163.0" layoutY="46.0" mnemonicParsing="false" onAction="#solve" text="Solve" />
-                  <Button fx:id="save_button" layoutX="201.0" layoutY="491.0" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="save_button" layoutX="201.0" layoutY="491.0" mnemonicParsing="false" onAction="#save" text="Save" />
                   <ChoiceBox fx:id="method" layoutX="49.0" layoutY="94.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Button fx:id="pause_button" layoutX="90.0" layoutY="378.0" mnemonicParsing="false" onAction="#handle_pause_play" text=" ▶ " />
-                  <Button fx:id="stop_button" layoutX="148.0" layoutY="378.0" mnemonicParsing="false" onAction="#handle_stop" text="⏹" />
+                  <Button fx:id="pause_button" layoutX="90.0" layoutY="319.0" mnemonicParsing="false" onAction="#handle_pause_play" text=" ▶ " />
+                  <Button fx:id="stop_button" layoutX="148.0" layoutY="319.0" mnemonicParsing="false" onAction="#handle_stop" text="⏹" />
                   <Label fx:id="iteration_label" layoutX="35.0" layoutY="174.0" text="total iterations: " />
                   <Label fx:id="time_label" layoutX="35.0" layoutY="204.0" text="time taken: " />
-                  <Label layoutX="32.0" layoutY="249.0" text="found solution: " />
-                  <Label fx:id="solution_label" layoutX="32.0" layoutY="275.0" maxWidth="-Infinity" prefHeight="17.0" prefWidth="198.0" />
+                  <Label fx:id="solution_text" layoutX="35.0" layoutY="249.0" text="found solution: " />
+                  <Label fx:id="solution_label" layoutX="35.0" layoutY="275.0" maxWidth="-Infinity" prefHeight="17.0" prefWidth="198.0" />
+                  <Label fx:id="shortcuts" alignment="TOP_LEFT" layoutX="17.0" layoutY="396.0" prefHeight="148.0" prefWidth="160.0" text="Shortcuts: " />
                </children>
             </AnchorPane>
          </children>
