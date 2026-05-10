@@ -1,0 +1,186 @@
+----------- Initial ----------
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O*ZX*X
+XXXXXXXX
+XXXXXXXX
+999 999 999 999 999 999 999 999 
+999 8 8 8 999 8 8 999 
+999 8 8 999 8 8 8 999 
+999 8 7 8 8 8 8 999 
+999 999 8 8 8 8 7 999 
+999 8 8 8 8 999 8 999 
+999 999 999 999 999 999 999 999 
+999 999 999 999 999 999 999 999 
+
+----------- Result ----------
+status: found
+algorithm: UCS
+solusi: U R U L D L D 
+cost: 112
+time taken: 0.366900ms
+total iterations: 16
+
+Iteration 1:
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O*ZX*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 2: U
+XXXXXXXX
+X***X2*X
+X**XZ*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 3: L
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+XZO**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 4: R
+XXXXXXXX
+X***X2*X
+X**X0*ZX
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 5: D
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O*ZX*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 6: U
+XXXXXXXX
+X***X2ZX
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 7: L
+XXXXXXXX
+X***X2*X
+X**XZ*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 8: L
+XXXXXXXX
+X***XZ*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 9: R
+XXXXXXXX
+X***X2ZX
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 10: L
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+XZO**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 11: D
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**ZLX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 12: D
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O*ZX*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 13: L
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XXZ**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 14: L
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+XZO**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 15: U
+XXXXXXXX
+X***XZ*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*O**X*X
+XXXXXXXX
+XXXXXXXX
+
+Iteration 16: D
+XXXXXXXX
+X***X2*X
+X**X0*1X
+X*L****X
+XX4**3LX
+X*Z**X*X
+XXXXXXXX
+XXXXXXXX
+

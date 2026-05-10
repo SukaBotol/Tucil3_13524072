@@ -2,7 +2,9 @@ package stima;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -11,10 +13,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -53,7 +57,7 @@ public class controller implements Initializable{
     private Button solve_button;
     
     @FXML
-    private Label solution_label;
+    private TextArea solution_label;
 
     @FXML
     private Label solution_text;
@@ -112,14 +116,18 @@ public class controller implements Initializable{
     // file IO
     FileChooser filechooser = new FileChooser();
     File file;
-    public void selectFile(ActionEvent e){
-        filechooser.setInitialDirectory(new File("../Tucil3_13524072/data"));
+    public void selectFile(ActionEvent e) throws URISyntaxException, IOException{
+        File jarDir = new File(controller.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+        File initialDirectory = new File(jarDir, "../test/in").getCanonicalFile();
+        if (initialDirectory.isDirectory()) {
+            filechooser.setInitialDirectory(initialDirectory);
+        }
         if(board_thread!=null){
             board_thread.interrupt();
         }
         filechooser.setTitle("Open a .txt file");
         filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
-        file = filechooser.showOpenDialog(new Stage());
+        file = filechooser.showOpenDialog((Stage) ((Node) e.getSource()).getScene().getWindow());
         if (file==null) return;
         try{
             current = the_i.read_file(file.getPath());
@@ -141,11 +149,13 @@ public class controller implements Initializable{
         boarding();
     }
 
-
-    // WIP
     @FXML
-    void save(ActionEvent event){
-        filechooser.setInitialDirectory(new File("../Tucil3_13524072/test"));
+    void save(ActionEvent event) throws URISyntaxException, IOException{
+        File jarDir = new File(controller.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+        File initialDirectory = new File(jarDir, "../test/out").getCanonicalFile();
+        if (initialDirectory.isDirectory()) {
+            filechooser.setInitialDirectory(initialDirectory);
+        }
         filechooser.setTitle("Save to .txt file");
         filechooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
         File file = filechooser.showSaveDialog(new Stage());
@@ -153,14 +163,68 @@ public class controller implements Initializable{
         if(file != null){
             StringBuilder stringgy = new StringBuilder();
             matrix.position temp = null;
+            stringgy.append("----------- Initial ----------\n");
             stringgy.append(current.matrix_to_string(temp));
-            stringgy.append("----------- Result ----------\n");
+            stringgy.append("\n----------- Result ----------\n");
+            if(result.path!=null){
+                stringgy.append("status: found\n");
+                stringgy.append("algorithm: "+method.getValue()+"\n");
+                stringgy.append("solusi: ");
+                matrix.position temp_player = current.player;
+                for(matrix.direction dir : result.path){
+                    temp_player = current.simulate_move(dir, temp_player, current.visited_numbers).end_pos;
+                    switch (dir) {
+                        case UP:
+                            stringgy.append("U ");
+                            break;
+                        case DOWN:
+                            stringgy.append("D ");
+                            break;
+                        case LEFT:
+                            stringgy.append("L ");
+                            break;
+                        case RIGHT:
+                            stringgy.append("R ");
+                            break;
+                        default:
+                            throw new AssertionError();
+                    }
+                }
+                stringgy.append("\n");
+                stringgy.append(cost_label.getText()+"\n");
+
+            }
+            else{
+                stringgy.append("status: not found\n");
+                stringgy.append("algorithm: "+method.getValue()+"\n");
+                stringgy.append("solusi: \n");
+                stringgy.append("cost: \n");
+            }
+
             stringgy.append(time_label.getText()+"\n");
             stringgy.append(iteration_label.getText()+"\n\n");
 
             int i=1;
             for(matrix.State st : result.iterations){
-                stringgy.append("Iteration "+i+":\n");
+                if(!result.iterations.get(i-1).path.isEmpty()){
+                    stringgy.append("Iteration "+i+": ");
+                    matrix.direction tempDir = result.iterations.get(i-1).path.get(result.iterations.get(i-1).path.size()-1);
+                    if(tempDir == matrix.direction.UP){
+                        stringgy.append("U\n");
+                    }
+                    else if(tempDir == matrix.direction.DOWN){
+                        stringgy.append("D\n");
+                    }
+                    else if(tempDir == matrix.direction.LEFT){
+                        stringgy.append("L\n");
+                    }
+                    else{
+                        stringgy.append("R\n");
+                    }
+                }
+                else{
+                    stringgy.append("Iteration "+i+":\n");
+                }
                 stringgy.append(current.matrix_to_string(st.pos));
                 stringgy.append("\n");
                 i++;
